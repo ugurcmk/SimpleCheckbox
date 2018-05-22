@@ -9,9 +9,9 @@ import UIKit
 /// Checkbox is a simple, animation free checkbox and UISwitch alternative designed
 /// to be performant and easy to implement.
 public class Checkbox: UIControl {
-
+    
     // MARK: - Enums
-
+    
     /// Shape of the center checkmark that appears when `Checkbox.isChecked == true`.
     public enum CheckmarkStyle {
         /// ■
@@ -23,7 +23,8 @@ public class Checkbox: UIControl {
         /// ✓
         case tick
     }
-
+    
+    
     /// Shape of the outside box containing the checkmarks contents.
     ///
     /// Used as a visual indication of where the user can tap.
@@ -33,21 +34,21 @@ public class Checkbox: UIControl {
         /// ◯
         case circle
     }
-
+    
     // MARK: - Properties
-
+    
     /// Shape of the center checkmark that appears when `Checkbox.isChecked == true`.
     ///
     /// **Default:** `CheckmarkStyle.square`
     public var checkmarkStyle: CheckmarkStyle = .square
-
+    
     /// Shape of the outside border containing the checkmarks contents.
     ///
     /// Used as a visual indication of where the user can tap.
     ///
     /// **Default:** `BorderStyle.square`
     public var borderStyle: BorderStyle = .square
-
+    
     /// Width of the borders stroke.
     ///
     /// **NOTE**
@@ -58,24 +59,24 @@ public class Checkbox: UIControl {
     ///
     /// **Default:** `2`
     public var borderWidth: CGFloat = 2
-
+    
     /// Size of the center checkmark element.
     ///
     /// Drawn as a percentage of the size of the Checkbox's draw rect.
     ///
     /// **Default:** `0.5`
     public var checkmarkSize: CGFloat = 0.5
-
+    
     /// **Default:** The current tintColor.
     public var uncheckedBorderColor: UIColor!
     public var checkedBorderColor: UIColor!
-
+    
     /// **Default:** The current tintColor.
     public var checkmarkColor: UIColor!
-
+    
     /// **Default:** White.
     public var checkboxBackgroundColor: UIColor! = .white
-
+    
     /// Increases the controls touch area.
     ///
     /// Checkbox's tend to be smaller than regular UIButton elements
@@ -84,66 +85,112 @@ public class Checkbox: UIControl {
     ///
     /// **Default:** `5`
     public var increasedTouchRadius: CGFloat = 5
-
+    
     /// A function can be passed in here and will be called
     /// when the `isChecked` value changes due to a tap gesture
     /// triggered by the user.
     ///
     /// An alternative to use the TargetAction method.
     public var valueChanged: ((_ isChecked: Bool) -> Void)?
-
+    
     /// Indicates whether the checkbox is currently in a state of being
     /// checked or not.
     public var isChecked: Bool = false {
         didSet { setNeedsDisplay() }
     }
-
+    
+    /// Set text value.
+    public var text: String = ""
+    
+    /// Specify the space at between box and text.
+    /// **Default:** 10
+    public var textGap: CGFloat = 10
+    
+    /// Set text color.
+    /// **Default:** 'black'
+    public var textColor: UIColor = .black
+    
+    /// Set text background color.
+    /// **Default:** 'white'
+    public var textBackgroundColor: UIColor = .white
+    
+    /// Set text alignment.
+    /// **Default:** left
+    /**
+     values :
+     - kCAAlignmentNatural
+     - kCAAlignmentLeft
+     - kCAAlignmentRight
+     - kCAAlignmentCenter
+     - kCAAlignmentJustified
+     */
+    public var textAlignment: String = kCAAlignmentLeft
+    
+    /// Set font size.
+    /// **Default:** 18
+    public var fontSize: CGFloat = 18
+    
     public var useHapticFeedback: Bool = true
-
+    
     private var feedbackGenerator: UIImpactFeedbackGenerator?
-
+    
     // MARK: - Lifecycle
-
+    
     public override init(frame: CGRect) {
         super.init(frame: frame)
         setupDefaults()
     }
-
+    
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         setupDefaults()
     }
-
+    
     private func setupDefaults() {
         backgroundColor = UIColor.init(white: 1, alpha: 0)
         uncheckedBorderColor = tintColor
         checkedBorderColor = tintColor
         checkmarkColor = tintColor
-
+        
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTapGesture(recognizer:)))
         addGestureRecognizer(tapGesture)
-
+        
         if useHapticFeedback {
             feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
             feedbackGenerator?.prepare()
         }
     }
-
+    
+    
+    private func drawText(rect: CGRect) {
+        let textLayer = CATextLayer()
+        textLayer.frame = CGRect(x: CGFloat(rect.width+textGap), y: rect.origin.y, width: 100, height: 30)
+        textLayer.foregroundColor = textColor.cgColor
+        textLayer.backgroundColor = textBackgroundColor.cgColor
+        textLayer.alignmentMode = textAlignment
+        textLayer.contentsScale = UIScreen.main.scale
+        textLayer.font = CTFontCreateWithName(UIFont.systemFont(ofSize: 0).fontName as CFString, 0, nil)
+        textLayer.fontSize = fontSize
+        textLayer.string = text
+        layer.addSublayer(textLayer)
+    }
+    
     override public func draw(_ rect: CGRect) {
         drawBorder(shape: borderStyle, in: rect)
         if isChecked {
             drawCheckmark(style: checkmarkStyle, in: rect)
         }
     }
-
+    
     // MARK: - Borders
-
+    
     private func drawBorder(shape: BorderStyle, in rect: CGRect) {
         let adjustedRect = CGRect(x: borderWidth/2,
                                   y: borderWidth/2,
                                   width: rect.width-borderWidth,
                                   height: rect.height-borderWidth)
-
+        drawText(rect: adjustedRect)
+        
         switch shape {
         case .circle:
             circleBorder(rect: adjustedRect)
@@ -151,39 +198,39 @@ public class Checkbox: UIControl {
             squareBorder(rect: adjustedRect)
         }
     }
-
+    
     private func squareBorder(rect: CGRect) {
         let rectanglePath = UIBezierPath(rect: rect)
-
+        
         if isChecked {
             checkedBorderColor.setStroke()
         } else {
             uncheckedBorderColor.setStroke()
         }
-
+        
         rectanglePath.lineWidth = borderWidth
         rectanglePath.stroke()
         checkboxBackgroundColor.setFill()
         rectanglePath.fill()
     }
-
+    
     private func circleBorder(rect: CGRect) {
         let ovalPath = UIBezierPath(ovalIn: rect)
-
+        
         if isChecked {
             checkedBorderColor.setStroke()
         } else {
             uncheckedBorderColor.setStroke()
         }
-
+        
         ovalPath.lineWidth = borderWidth / 2
         ovalPath.stroke()
         checkboxBackgroundColor.setFill()
         ovalPath.fill()
     }
-
+    
     // MARK: - Checkmarks
-
+    
     private func drawCheckmark(style: CheckmarkStyle, in rect: CGRect) {
         let adjustedRect = checkmarkRect(in: rect)
         switch checkmarkStyle {
@@ -197,19 +244,19 @@ public class Checkbox: UIControl {
             tickCheckmark(rect: adjustedRect)
         }
     }
-
+    
     private func circleCheckmark(rect: CGRect) {
         let ovalPath = UIBezierPath(ovalIn: rect)
         checkmarkColor.setFill()
         ovalPath.fill()
     }
-
+    
     private func squareCheckmark(rect: CGRect) {
         let path = UIBezierPath(rect: rect)
         checkmarkColor.setFill()
         path.fill()
     }
-
+    
     private func crossCheckmark(rect: CGRect) {
         let bezier4Path = UIBezierPath()
         bezier4Path.move(to: CGPoint(x: rect.minX + 0.06250 * rect.width, y: rect.minY + 0.06452 * rect.height))
@@ -220,7 +267,7 @@ public class Checkbox: UIControl {
         bezier4Path.lineWidth = checkmarkSize * 2
         bezier4Path.stroke()
     }
-
+    
     private func tickCheckmark(rect: CGRect) {
         let bezierPath = UIBezierPath()
         bezierPath.move(to: CGPoint(x: rect.minX + 0.04688 * rect.width, y: rect.minY + 0.63548 * rect.height))
@@ -230,9 +277,9 @@ public class Checkbox: UIControl {
         bezierPath.lineWidth = checkmarkSize * 2
         bezierPath.stroke()
     }
-
+    
     // MARK: - Size Calculations
-
+    
     private func checkmarkRect(in rect: CGRect) -> CGRect {
         let width = rect.maxX * checkmarkSize
         let height = rect.maxY * checkmarkSize
@@ -242,28 +289,29 @@ public class Checkbox: UIControl {
                                   height: height)
         return adjustedRect
     }
-
+    
     // MARK: - Touch
-
+    
     @objc private func handleTapGesture(recognizer: UITapGestureRecognizer) {
         isChecked = !isChecked
         valueChanged?(isChecked)
         sendActions(for: .valueChanged)
-
+        
         if useHapticFeedback {
             // Trigger impact feedback.
             feedbackGenerator?.impactOccurred()
-
+            
             // Keep the generator in a prepared state.
             feedbackGenerator?.prepare()
         }
     }
-
+    
     override public func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
         let relativeFrame = self.bounds
         let hitTestEdgeInsets = UIEdgeInsets(top: -increasedTouchRadius, left: -increasedTouchRadius, bottom: -increasedTouchRadius, right: -increasedTouchRadius)
         let hitFrame = UIEdgeInsetsInsetRect(relativeFrame, hitTestEdgeInsets)
         return hitFrame.contains(point)
     }
-
+    
 }
+
