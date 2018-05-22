@@ -20,7 +20,7 @@ class ViewController: UIViewController {
         let circleBox = Checkbox(frame: CGRect(x: 30, y: 40, width: 25, height: 25))
         circleBox.borderStyle = .circle
         circleBox.checkmarkStyle = .circle
-        circleBox.text = "Lefted Text"
+        circleBox.text = "Left Text"
         circleBox.borderWidth = 1
         circleBox.uncheckedBorderColor = .lightGray
         circleBox.checkedBorderColor = .blue
@@ -34,7 +34,7 @@ class ViewController: UIViewController {
         squareBox.tintColor = .black
         squareBox.borderStyle = .square
         squareBox.text = "Centered Text"
-        squareBox.textAlignment = kCAAlignmentCenter
+        squareBox.textAlignment =  .center
         squareBox.checkmarkStyle = .square
         squareBox.uncheckedBorderColor = .lightGray
         squareBox.borderWidth = 1
@@ -47,6 +47,8 @@ class ViewController: UIViewController {
         let crossBox = Checkbox(frame: CGRect(x: 30, y: 120, width: 25, height: 25))
         crossBox.borderStyle = .square
         crossBox.checkmarkStyle = .cross
+        crossBox.text = "Right Text"
+        crossBox.textAlignment = .right
         crossBox.checkmarkSize = 0.7
         view.addSubview(crossBox)
 

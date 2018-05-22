@@ -35,6 +35,14 @@ public class Checkbox: UIControl {
         case circle
     }
     
+    public enum TextAlignment: String{
+        case left       = "left"
+        case right      = "right"
+        case center     = "center"
+        case justified  = "justified"
+        case natural    = "natural"
+    }
+    
     // MARK: - Properties
     
     /// Shape of the center checkmark that appears when `Checkbox.isChecked == true`.
@@ -116,15 +124,7 @@ public class Checkbox: UIControl {
     
     /// Set text alignment.
     /// **Default:** left
-    /**
-     values :
-     - kCAAlignmentNatural
-     - kCAAlignmentLeft
-     - kCAAlignmentRight
-     - kCAAlignmentCenter
-     - kCAAlignmentJustified
-     */
-    public var textAlignment: String = kCAAlignmentLeft
+    public var textAlignment: TextAlignment = TextAlignment.left
     
     /// Set font size.
     /// **Default:** 18
@@ -167,7 +167,7 @@ public class Checkbox: UIControl {
         textLayer.frame = CGRect(x: CGFloat(rect.width+textGap), y: rect.origin.y, width: CGFloat(text.count*20), height: 30)
         textLayer.foregroundColor = textColor.cgColor
         textLayer.backgroundColor = textBackgroundColor.cgColor
-        textLayer.alignmentMode = textAlignment
+        textLayer.alignmentMode = textAlignment.rawValue
         textLayer.contentsScale = UIScreen.main.scale
         textLayer.font = CTFontCreateWithName(UIFont.systemFont(ofSize: 0).fontName as CFString, 0, nil)
         textLayer.fontSize = fontSize
