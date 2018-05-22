@@ -164,7 +164,7 @@ public class Checkbox: UIControl {
     
     private func drawText(rect: CGRect) {
         let textLayer = CATextLayer()
-        textLayer.frame = CGRect(x: CGFloat(rect.width+textGap), y: rect.origin.y, width: 100, height: 30)
+        textLayer.frame = CGRect(x: CGFloat(rect.width+textGap), y: rect.origin.y, width: CGFloat(text.count*20), height: 30)
         textLayer.foregroundColor = textColor.cgColor
         textLayer.backgroundColor = textBackgroundColor.cgColor
         textLayer.alignmentMode = textAlignment
